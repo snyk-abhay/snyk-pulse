@@ -1,0 +1,67 @@
+frontend/index.html
+  s_e29bbfbf49b627::t_e8ec8e0b62014a 1-14
+frontend/src/App.tsx
+  s_e29bbfbf49b627::t_239a20330d652c 1-1876
+frontend/src/Chart.tsx
+  s_e29bbfbf49b627::t_af0e824bf7ffc2 1-133
+frontend/src/MetricGuide.tsx
+  s_e29bbfbf49b627::t_2ea7eb0887d748 1-300
+frontend/src/Personas.tsx
+  s_e29bbfbf49b627::t_c3af3601712bed 1-422
+frontend/src/ReportGenerator.tsx
+  s_e29bbfbf49b627::t_affbaa8c4c880e 1-538
+frontend/src/Setup.tsx
+  s_e29bbfbf49b627::t_131a1a0f801826 1-1254
+frontend/src/api.ts
+  s_e29bbfbf49b627::t_e3eaf3cc6ae689 1-29
+frontend/src/catalog.ts
+  s_e29bbfbf49b627::t_4f1220fc97ef52 1-241
+frontend/src/design-tokens.css
+  s_e29bbfbf49b627::t_b9019ea8430b90 1-113
+frontend/src/style.css
+  s_e29bbfbf49b627::t_1ba73a0dd744f2 1-2637
+frontend/src/types.ts
+  s_e29bbfbf49b627::t_87af038132568d 1-176
+lib/connection.mjs
+  s_e29bbfbf49b627::t_d5a847d07bfa57 1-265
+lib/csv.mjs
+  s_e29bbfbf49b627::t_0070dd0410916a 1-343
+lib/metrics.mjs
+  s_e29bbfbf49b627::t_c32b9b3afefaec 1-369
+lib/owasp.mjs
+  s_e29bbfbf49b627::t_1a75170249f78b 1-40
+lib/reports.mjs
+  s_e29bbfbf49b627::t_675a5b7b64ad90 1-318
+lib/runtime.mjs
+  s_e29bbfbf49b627::t_678e0a7348e60f 1-354
+lib/server.mjs
+  s_e29bbfbf49b627::t_8151653347dff9 1-952
+lib/session.mjs
+  s_e29bbfbf49b627::t_1370a5090a49b8 1-239
+lib/store.mjs
+  s_e29bbfbf49b627::t_73f5043c4bb9c0 1-152
+package.json
+  s_e29bbfbf49b627::t_a64456d2e1bd1f 1-27
+pulse.mjs
+  s_e29bbfbf49b627::t_372551c216a9e7 1-357
+scripts/vendor-report.mjs
+  s_e29bbfbf49b627::t_0791517db1f330 1-63
+vendor/snyk-auto-report.mjs
+  s_e29bbfbf49b627::t_c6f953c45f2063 1-6487
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "66555806beba611ef3e91d01e92a3a3347e3dc04",
+  "prompts": {},
+  "sessions": {
+    "s_e29bbfbf49b627": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "831a0b68-436d-4628-98af-818f32a8117d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Abhay Kumar <abhay.kumar@snyk.io>"
+    }
+  }
+}
