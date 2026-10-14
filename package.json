@@ -1,0 +1,27 @@
+{
+  "name": "snyk-pulse-utility",
+  "version": "0.2.0",
+  "description": "One-command local Snyk CSV/API reporting utility",
+  "type": "module",
+  "private": true,
+  "bin": {
+    "snyk-pulse": "pulse.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node pulse.mjs",
+    "build": "node scripts/build-ui.mjs",
+    "vendor:report": "node scripts/vendor-report.mjs"
+  },
+  "files": [
+    "pulse.mjs",
+    "lib",
+    "vendor",
+    "web",
+    "examples",
+    "docs",
+    "README.md"
+  ]
+}

@@ -1,0 +1,47 @@
+name: Feature request
+description: Suggest a new dashboard, metric, report option, data source or improvement.
+title: "[Snyk Pulse] "
+labels: ["enhancement"]
+body:
+  - type: dropdown
+    id: tool
+    attributes:
+      label: Which tool?
+      options:
+        - Snyk Pulse
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: audience
+    attributes:
+      label: Who is it for?
+      multiple: true
+      options:
+        - CISO / leadership
+        - Application security team
+        - Engineering / developers
+        - Admin / setup
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does it solve?
+      description: What are you trying to do today, and what gets in the way?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would you like?
+      description: The number, chart, filter, report section or behaviour you want. A sketch or example output helps.
+    validations:
+      required: true
+  - type: textarea
+    id: data
+    attributes:
+      label: Data it needs
+      description: Which Snyk columns or API data would this use, if you know? Do not paste real customer data.
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Anything you tried instead?

@@ -1,0 +1,10 @@
+node_modules/
+frontend/dist/
+*.tgz
+.env
+.env.*
+.DS_Store
+*.db
+*.db-*
+reports/
+pulse-reports/

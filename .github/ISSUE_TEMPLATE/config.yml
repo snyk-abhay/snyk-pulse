@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Snyk Pulse user guide
+    url: https://github.com/snyk-abhay/snyk-pulse/blob/main/docs/USER_GUIDE.md
+    about: Setup, running, dashboards, reports and troubleshooting.

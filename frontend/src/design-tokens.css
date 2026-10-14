@@ -1,0 +1,113 @@
+:root,
+[data-theme="dark"] {
+  --bg: #0b0613;
+  --surface: #130b1e;
+  --raised: #1b1229;
+  --sunken: #0e0817;
+  --border: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(255, 255, 255, 0.22);
+  --text: #ffffff;
+  --text2: rgba(255, 255, 255, 0.74);
+  --muted: rgba(255, 255, 255, 0.52);
+  --accent: #6f00dd;
+  --accent-hover: #8f3ce8;
+  --accent-text: #c481f3;
+  --accent-subtle: rgba(111, 0, 221, 0.2);
+  --sev-c: #e5484d;
+  --sev-h: #f2662b;
+  --sev-m: #f5a524;
+  --sev-l: #8a8799;
+  --sev-c-text: #ff7a7e;
+  --sev-h-text: #ff8a57;
+  --sev-m-text: #f5b642;
+  --sev-l-text: #b3b0c2;
+  --good: #2bd48f;
+  --good-bg: rgba(43, 212, 143, 0.14);
+  --warn: #f9c748;
+  --warn-bg: rgba(249, 199, 72, 0.14);
+  --crit: #ff6b6e;
+  --crit-bg: rgba(255, 77, 79, 0.15);
+  --neutral-bg: rgba(255, 255, 255, 0.08);
+  --cat1: #8f3ce8;
+  --cat2: #4da3ff;
+  --cat3: #2bb5b5;
+  --cat4: #e501fb;
+  --cat5: #9aa7ff;
+  --cat6: #5ed1e8;
+  --logo-filter: none;
+  --scrim: rgba(5, 2, 10, 0.6);
+  --page: #ffffff;
+}
+[data-theme="light"] {
+  --bg: #f6f5f9;
+  --surface: #ffffff;
+  --raised: #ffffff;
+  --sunken: #f1eff5;
+  --border: #e4e1eb;
+  --border-strong: #cbc6d6;
+  --text: #0b0613;
+  --text2: #4a4a52;
+  --muted: #6b6b72;
+  --accent: #6f00dd;
+  --accent-hover: #5b26c8;
+  --accent-text: #6f00dd;
+  --accent-subtle: #f0e1fc;
+  --sev-c: #c9252d;
+  --sev-h: #e0541a;
+  --sev-m: #e09a10;
+  --sev-l: #7a7789;
+  --sev-c-text: #b0141c;
+  --sev-h-text: #b03f0e;
+  --sev-m-text: #8a5a00;
+  --sev-l-text: #55536a;
+  --good: #0b8a5a;
+  --good-bg: #ddf5ea;
+  --warn: #8f5b00;
+  --warn-bg: #fcf0cf;
+  --crit: #c21f27;
+  --crit-bg: #fde3e3;
+  --neutral-bg: #efedf3;
+  --cat1: #6f00dd;
+  --cat2: #2b7fd9;
+  --cat3: #14908f;
+  --cat4: #b300c4;
+  --cat5: #6c7bea;
+  --cat6: #2aa7c2;
+  --logo-filter: invert(1);
+  --scrim: rgba(11, 6, 19, 0.35);
+  --page: #ffffff;
+}
+body {
+  margin: 0;
+  background: #0b0613;
+  font-family: "Geist", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+* {
+  box-sizing: border-box;
+}
+a {
+  color: var(--accent-text);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+input::placeholder {
+  color: var(--muted);
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 1;
+  }
+}

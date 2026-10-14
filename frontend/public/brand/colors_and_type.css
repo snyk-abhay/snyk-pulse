@@ -1,0 +1,258 @@
+/* =============================================================
+   Snyk Marketing Design System — Foundations
+   Extracted from the Snyk Corporate Template 2026 (PPTX) and
+   matched to the public Snyk brand presentation.
+
+   This file defines:
+     1. Color tokens  (raw + semantic)
+     2. Type tokens   (families, weights, sizes, semantic styles)
+     3. Spacing + radii + shadow + motion tokens
+     4. Helper classes for the most common type styles
+   ============================================================= */
+
+/* ---------- 1. Fonts ------------------------------------------------- */
+/* Geist Sans — loaded locally from a variable font (weights 100–900). */
+@font-face {
+  font-family: "Geist";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url("./Geist-VariableFont_wght.ttf") format("truetype-variations"),
+       url("./Geist-VariableFont_wght.ttf") format("truetype");
+}
+/* Geist Mono — not yet uploaded. Pulled from Google Fonts as a substitute.
+   To self-host: drop GeistMono-VariableFont_wght.ttf into fonts/ and update this rule. */
+
+:root {
+  /* ============================================================
+     2. Color — raw palette
+     ============================================================ */
+
+  /* Brand purples — Snyk's signature ink + magenta family ----- */
+  --snyk-ink:           #0B0613;   /* near-black with a violet bias */
+  --snyk-black:         #000000;
+  --snyk-purple-900:    #1B0A3A;   /* deepest brand purple        */
+  --snyk-purple-800:    #2A0F66;
+  --snyk-purple-700:    #3E1E93;   /* hero deep purple from deck  */
+  --snyk-purple-600:    #5B26C8;
+  --snyk-purple-500:    #6F00DD;   /* primary vibrant purple      */
+  --snyk-purple-400:    #8F3CE8;
+  --snyk-purple-300:    #C481F3;   /* soft lavender, accents      */
+  --snyk-purple-200:    #DDB6F8;
+  --snyk-purple-100:    #F0E1FC;
+
+  /* Magenta — used in titling + halftone wave tip --------------- */
+  --snyk-magenta:       #FF00FF;
+  --snyk-pink:          #E501FB;
+
+  /* Warm accent — gradient tail "fire" trim --------------------- */
+  --snyk-orange:        #FF8904;
+  --snyk-amber:         #F9C748;
+  --snyk-coral:         #E46962;
+
+  /* Neutrals --------------------------------------------------- */
+  --snyk-white:         #FFFFFF;
+  --snyk-gray-50:       #F7F7F8;
+  --snyk-gray-100:      #EDEDED;
+  --snyk-gray-200:      #D8D8DA;
+  --snyk-gray-300:      #CACACA;
+  --snyk-gray-400:      #9A9AA0;
+  --snyk-gray-500:      #6B6B72;
+  --snyk-gray-600:      #4A4A52;
+  --snyk-gray-700:      #2F2F36;
+  --snyk-gray-800:      #262626;   /* near-black body / cards    */
+  --snyk-gray-900:      #141416;
+
+  /* ============================================================
+     Color — gradients (signature brand gradients)
+     ============================================================ */
+  --grad-snyk-fire:     linear-gradient(135deg, #6F00DD 0%, #E501FB 45%, #FF8904 100%); /* @kind color */
+  --grad-snyk-deep:     linear-gradient(135deg, #1B0A3A 0%, #3E1E93 60%, #6F00DD 100%); /* @kind color */
+  --grad-snyk-glow:     radial-gradient(120% 90% at 100% 100%, #6F00DD 0%, #2A0F66 45%, #0B0613 80%); /* @kind color */
+  --grad-snyk-pop:      linear-gradient(90deg, #C481F3 0%, #FF00FF 100%); /* @kind color */
+
+  /* ============================================================
+     Color — semantic tokens (use these in components)
+     ============================================================ */
+  --color-bg:           var(--snyk-ink);
+  --color-bg-elevated:  #14091F;
+  --color-bg-inverse:   var(--snyk-white);
+  --color-surface:      rgba(255,255,255,0.04);
+  --color-surface-hi:   rgba(255,255,255,0.08);
+  --color-border:       rgba(255,255,255,0.12);
+  --color-border-strong:rgba(255,255,255,0.24);
+
+  --color-fg:           var(--snyk-white);
+  --color-fg-muted:     rgba(255,255,255,0.72);
+  --color-fg-subtle:    rgba(255,255,255,0.48);
+  --color-fg-inverse:   var(--snyk-ink);
+
+  --color-accent:       var(--snyk-purple-500);
+  --color-accent-hover: var(--snyk-purple-400);
+  --color-accent-fg:    var(--snyk-white);
+
+  --color-success:      #00C781;
+  --color-warning:      #F9C748;
+  --color-danger:       #FF4D4F;
+  --color-info:         #4DA3FF;
+
+  /* ============================================================
+     3. Type — families + weights
+     ============================================================ */
+  --font-sans:    "Geist", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Geist", "Space Grotesk", "Inter", sans-serif;
+  --font-mono:    "Geist Mono", "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --fw-regular:   400; /* @kind font */
+  --fw-medium:    500; /* @kind font */
+  --fw-semibold:  600; /* @kind font */
+  --fw-bold:      700; /* @kind font */
+  --fw-black:     900; /* @kind font */
+
+  /* Type scale — tuned for marketing (decks + landing pages) --- */
+  --fs-12: 0.75rem;
+  --fs-14: 0.875rem;
+  --fs-16: 1rem;
+  --fs-18: 1.125rem;
+  --fs-20: 1.25rem;
+  --fs-24: 1.5rem;
+  --fs-32: 2rem;
+  --fs-40: 2.5rem;
+  --fs-48: 3rem;
+  --fs-56: 3.5rem;
+  --fs-72: 4.5rem;
+  --fs-96: 6rem;
+  --fs-128: 8rem;
+
+  --lh-tight:    1.05; /* @kind font */
+  --lh-snug:     1.18; /* @kind font */
+  --lh-normal:   1.4; /* @kind font */
+  --lh-relaxed:  1.6; /* @kind font */
+
+  --tracking-display: -0.025em; /* @kind font */
+  --tracking-tight:   -0.015em; /* @kind font */
+  --tracking-normal:  0em; /* @kind font */
+  --tracking-wide:    0.04em; /* @kind font */
+  --tracking-eyebrow: 0.14em; /* @kind font */
+
+  /* ============================================================
+     4. Spacing, radii, shadow, motion
+     ============================================================ */
+  --space-1:   4px;
+  --space-2:   8px;
+  --space-3:   12px;
+  --space-4:   16px;
+  --space-5:   20px;
+  --space-6:   24px;
+  --space-8:   32px;
+  --space-10:  40px;
+  --space-12:  48px;
+  --space-16:  64px;
+  --space-20:  80px;
+  --space-24:  96px;
+
+  --radius-xs:   4px;
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   16px;
+  --radius-xl:   24px;
+  --radius-2xl:  32px;
+  --radius-pill: 999px;
+
+  --shadow-glow-purple: 0 0 0 1px rgba(196,129,243,0.28),
+                        0 12px 40px -8px rgba(111,0,221,0.55);
+  --shadow-soft:        0 8px 24px -8px rgba(0,0,0,0.35);
+  --shadow-card:        0 10px 30px -12px rgba(0,0,0,0.55);
+  --shadow-pop:         0 24px 60px -16px rgba(111,0,221,0.45);
+
+  --ease-standard:  cubic-bezier(0.2, 0.0, 0.0, 1.0); /* @kind other */
+  --ease-emphasis:  cubic-bezier(0.2, 0.0, 0.0, 1.2); /* @kind other */
+  --dur-fast:   120ms; /* @kind other */
+  --dur-base:   200ms; /* @kind other */
+  --dur-slow:   360ms; /* @kind other */
+}
+
+/* =============================================================
+   Semantic type classes — mirror the PPTX hierarchy.
+   Sizes feel right at 1920×1080 slides and 1440px web pages.
+   ============================================================= */
+.snyk-display {                            /* hero "make it big" */
+  font-family: var(--font-display);
+  font-weight: var(--fw-bold);
+  font-size:   clamp(56px, 7vw, 128px);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-display);
+}
+
+.snyk-h1 {
+  font-family: var(--font-display);
+  font-weight: var(--fw-bold);
+  font-size:   var(--fs-72);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-display);
+}
+.snyk-h2 {
+  font-family: var(--font-display);
+  font-weight: var(--fw-bold);
+  font-size:   var(--fs-48);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--tracking-tight);
+}
+.snyk-h3 {                                 /* "Title header, Geist Bold 24px" */
+  font-family: var(--font-display);
+  font-weight: var(--fw-bold);
+  font-size:   var(--fs-32);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--tracking-tight);
+}
+.snyk-h4 {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-semibold);
+  font-size:   var(--fs-24);
+  line-height: var(--lh-snug);
+}
+.snyk-subhead {                            /* "Subheader, Geist Bold 12px" */
+  font-family: var(--font-sans);
+  font-weight: var(--fw-semibold);
+  font-size:   var(--fs-16);
+  line-height: var(--lh-normal);
+}
+
+.snyk-body {                               /* "Body copy, Geist Normal 10px" */
+  font-family: var(--font-sans);
+  font-weight: var(--fw-regular);
+  font-size:   var(--fs-16);
+  line-height: var(--lh-relaxed);
+  color: var(--color-fg-muted);
+}
+.snyk-body-sm {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-regular);
+  font-size:   var(--fs-14);
+  line-height: var(--lh-relaxed);
+}
+
+.snyk-eyebrow {                            /* small caps label */
+  font-family: var(--font-mono);
+  font-weight: var(--fw-medium);
+  font-size:   var(--fs-12);
+  line-height: 1;
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--color-fg-subtle);
+}
+
+.snyk-mono {
+  font-family: var(--font-mono);
+  font-weight: var(--fw-regular);
+  font-size:   var(--fs-14);
+}
+
+/* Gradient text — use sparingly, for key word emphasis */
+.snyk-grad-text {
+  background: var(--grad-snyk-fire);
+  -webkit-background-clip: text;
+          background-clip: text;
+  -webkit-text-fill-color: transparent;
+          color: transparent;
+}
