@@ -1,0 +1,33 @@
+frontend/index.html
+  s_3a0091084c1aeb::t_f5b7b9b02e51e2 9-19
+frontend/src/App.tsx
+  s_3a0091084c1aeb::t_01ff2fd0af63a0 55-64,566,676-680
+frontend/src/ReportGenerator.tsx
+  s_3a0091084c1aeb::t_442267cd81a50e 3,10,35-49,131-148,198-273,276-281,290-304,345-533,535-537,539-553,555-558,560-562,565,608,610-614,713-732
+frontend/src/style.css
+  s_3a0091084c1aeb::t_23ca75dfb7a933 2638-2681
+lib/connection.mjs
+  s_3a0091084c1aeb::t_f036b8aea11dd4 106,112,130-132,268-289
+lib/reports.mjs
+  s_3a0091084c1aeb::t_a55f602c085fee 11,35-55,86-122,135-141,178-179,257-268,270-277,279-299,323-324
+lib/server.mjs
+  s_3a0091084c1aeb::t_dab7956cccf70d 20,146,457-458,461-473,476-484,486-489,492-508
+test/reports.test.mjs
+  s_3a0091084c1aeb::t_9ba7a37e5f7aaa 1-233
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "fd4c002e1460d8ab5011f501486d18d33410d1c2",
+  "prompts": {},
+  "sessions": {
+    "s_3a0091084c1aeb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "28fd88f7-c7bb-4c65-a5c3-ab2d0256bf89",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Abhay Kumar <abhay2510kr@gmail.com>"
+    }
+  }
+}
