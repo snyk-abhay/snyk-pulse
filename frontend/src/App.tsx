@@ -52,6 +52,16 @@ const navGroups: { label: string; pages: Page[] }[] = [
   { label: "REPORTS", pages: ["Generate", "Reports", "Builder"] },
   { label: "CONFIGURE", pages: ["Data", "SLA"] },
 ];
+// The chosen theme survives a refresh. index.html applies it before first paint;
+// this reads the same key so React's state starts out matching it.
+const THEME_KEY = "pulse-theme";
+function savedTheme(): "dark" | "light" {
+  try {
+    return localStorage.getItem(THEME_KEY) === "light" ? "light" : "dark";
+  } catch {
+    return "dark";
+  }
+}
 // Theme tokens (design-tokens.css); Chart resolves them per theme.
 export const palette = [
   "var(--cat1)",
@@ -553,7 +563,7 @@ export default function App() {
     [custom, setCustom] = useState<CustomMetric[]>([]),
     [page, setPage] = useState<Page>("CISO"),
     [setup, setSetup] = useState(false),
-    [theme, setTheme] = useState<"dark" | "light">("dark"),
+    [theme, setTheme] = useState<"dark" | "light">(savedTheme),
     [collapsed, setCollapsed] = useState(false),
     [revision, setRevision] = useState(0),
     [error, setError] = useState(""),
@@ -663,6 +673,11 @@ export default function App() {
   }, [state, query, period.start, period.end]);
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
+    try {
+      localStorage.setItem(THEME_KEY, theme);
+    } catch {
+      // Storage unavailable: the choice just lasts until the page is refreshed.
+    }
   }, [theme]);
   useEffect(() => {
     if (page !== "Explorer" || !state?.snapshot) return;

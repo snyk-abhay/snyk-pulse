@@ -2635,3 +2635,47 @@ textarea.invalid {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* ---- Report generator: four data sources and the scope pickers --------- */
+.source-options--four {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.scope-picker {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.scope-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.target-chips {
+  max-height: 160px;
+  overflow: auto;
+  margin-top: 8px;
+}
+.code-path {
+  display: grid;
+  gap: 4px;
+  margin-top: 12px;
+}
+.report-form label.check-row {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 13px;
+  text-align: left;
+}
+.report-form .check-row input {
+  width: 16px;
+  height: 16px;
+  min-height: 0;
+  padding: 0;
+  margin: 0;
+  accent-color: var(--accent);
+}

@@ -6,6 +6,17 @@
     <meta name="theme-color" content="#221744" />
     <link rel="icon" type="image/png" href="/brand/favicon.png" />
     <title>Snyk Pulse · Security posture</title>
+    <script>
+      // Apply the saved theme before first paint, so a light-theme user does not
+      // see a dark flash on every refresh. Storage can throw (blocked, private
+      // window); the app then simply starts dark, as it always has.
+      try {
+        var t = localStorage.getItem("pulse-theme");
+        document.documentElement.dataset.theme = t === "light" ? "light" : "dark";
+      } catch (e) {
+        document.documentElement.dataset.theme = "dark";
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

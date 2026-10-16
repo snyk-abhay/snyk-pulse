@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { mutate, request } from "./api";
-import type { AppState } from "./types";
+import type { AppState, SnykConnection, SnykScope } from "./types";
 
 type ReportFile = { format: string; bytes: number };
 type Report = {
   id: string;
   title: string;
   created_at: string;
-  source: "loaded" | "api";
+  source: string;
   source_label: string;
   formats: string[];
   filters: { severity: string; status: string; product: string };
@@ -32,6 +32,21 @@ type Overview = {
   loadedRows: number;
 };
 
+type Source = "export" | "issues" | "csv" | "cli";
+// The report generator's own four data sources, in the order its wizard offers them.
+const SOURCES: [Source, string, string][] = [
+  ["export", "Pull a full export from Snyk", "Export API: every field, but lags new scans by about 2 hours."],
+  ["issues", "Pull live results from Snyk", "Issues API: includes scans that just finished; no EPSS or KEV."],
+  ["csv", "Use data already in Pulse", "Reports-tab CSV or an earlier pull. Instant; no Snyk API call."],
+  ["cli", "Scan a local folder", "Snyk CLI: snyk code test + snyk test; shows the code at every data-flow step."],
+];
+const REGIONS: [string, string][] = [
+  ["us", "SNYK-US-01 · app.snyk.io"],
+  ["us02", "SNYK-US-02 · app.us.snyk.io"],
+  ["eu", "SNYK-EU-01 · app.eu.snyk.io"],
+  ["au", "SNYK-AU-01 · app.au.snyk.io"],
+  ["gov", "SNYK-GOV-01 · app.snykgov.io"],
+];
 const FORMATS: [string, string][] = [
   ["pdf", "PDF"],
   ["html", "HTML"],
@@ -113,7 +128,24 @@ export function ReportGenerator({
   const [overview, setOverview] = useState<Overview | null>(null),
     [revision, setRevision] = useState(0),
     [busy, setBusy] = useState(false),
-    [source, setSource] = useState<"loaded" | "api">("loaded"),
+    [source, setSource] = useState<Source>("csv"),
+    // Scope for the two Snyk API sources, as the CLI wizard asks for it.
+    [region, setRegion] = useState("us"),
+    [token, setToken] = useState(""),
+    [connection, setConnection] = useState<SnykConnection | null>(null),
+    [group, setGroup] = useState(""),
+    [groupOrgs, setGroupOrgs] = useState<SnykScope[] | null>(null),
+    [org, setOrg] = useState(""),
+    [targets, setTargets] = useState<SnykScope[] | null>(null),
+    [pickedTargets, setPickedTargets] = useState<string[]>([]),
+    [scopeBusy, setScopeBusy] = useState(false),
+    // CLI: a folder on this machine, and which scans to run.
+    [folder, setFolder] = useState(""),
+    [cliScans, setCliScans] = useState(["sast", "sca"]),
+    // Optional extras.
+    [details, setDetails] = useState(true),
+    [dataflow, setDataflow] = useState(true),
+    [codePath, setCodePath] = useState(""),
     [formats, setFormats] = useState(["pdf", "html"]),
     [severity, setSeverity] = useState<string[]>([]),
     [status, setStatus] = useState(["open"]),
@@ -163,8 +195,90 @@ export function ReportGenerator({
         </p>
       </div>
     );
+  const isApi = source === "export" || source === "issues";
+  const post = <T,>(path: string, body: unknown) =>
+    request<T>(path, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Pulse-Local": "1" },
+      body: JSON.stringify(body),
+    });
+  const resetScope = () => {
+    setConnection(null);
+    setGroup("");
+    setGroupOrgs(null);
+    setOrg("");
+    setTargets(null);
+    setPickedTargets([]);
+  };
+  // Token and region -> the groups and organizations this token can see.
+  const connect = async () => {
+    setScopeBusy(true);
+    resetScope();
+    try {
+      const result = await post<SnykConnection>("/api/connection/validate", { token, region });
+      setConnection(result);
+      setRegion(result.region);
+      setToken("");
+      setOrg(result.orgs[0]?.id || "");
+    } catch (e) {
+      onError((e as Error).message);
+    } finally {
+      setScopeBusy(false);
+    }
+  };
+  const pickGroup = async (id: string) => {
+    setGroup(id);
+    setOrg("");
+    setTargets(null);
+    setPickedTargets([]);
+    if (!id) {
+      setGroupOrgs(null);
+      setOrg(connection?.orgs[0]?.id || "");
+      return;
+    }
+    setScopeBusy(true);
+    try {
+      const r = await post<{ orgs: SnykScope[] }>("/api/connection/orgs", {
+        connectionId: connection?.id,
+        group: id,
+      });
+      setGroupOrgs(r.orgs);
+      setOrg(r.orgs[0]?.id || "");
+    } catch (e) {
+      onError((e as Error).message);
+    } finally {
+      setScopeBusy(false);
+    }
+  };
+  const pickOrg = (id: string) => {
+    setOrg(id);
+    setTargets(null);
+    setPickedTargets([]);
+  };
+  const loadTargets = async () => {
+    setScopeBusy(true);
+    try {
+      const r = await post<{ targets: SnykScope[] }>("/api/reports/targets", { org, region });
+      setTargets(r.targets);
+    } catch (e) {
+      onError((e as Error).message);
+    } finally {
+      setScopeBusy(false);
+    }
+  };
+  const orgChoices = group ? groupOrgs || [] : connection?.orgs || [];
+  const scopeName =
+    orgChoices.find((o) => o.id === org)?.name ||
+    connection?.groups.find((g) => g.id === group)?.name ||
+    "";
   const generate = async () => {
     if (!formats.length) return onError("Choose at least one format.");
+    if (isApi && !org && !group && !overview.canUseApi)
+      return onError("Connect to Snyk and choose an organization first.");
+    if (source === "cli" && !folder.trim())
+      return onError("Enter the folder to scan.");
+    if (source === "cli" && !cliScans.length)
+      return onError("Choose at least one scan to run.");
     if ((period === "from" || period === "range") && !fromDate)
       return onError("Choose a start date for the period.");
     if (period === "range" && !toDate)
@@ -173,6 +287,21 @@ export function ReportGenerator({
     try {
       await mutate("/api/reports/generate", {
         source,
+        // Scope: only the two Snyk API sources use these.
+        ...(isApi
+          ? {
+              region,
+              group: org ? "" : group,
+              org,
+              scopeName,
+              targets: pickedTargets,
+              token: token || undefined,
+            }
+          : {}),
+        ...(source === "cli" ? { path: folder.trim(), cliScanners: cliScans } : {}),
+        ...(source !== "cli" && codePath.trim() ? { codePath: codePath.trim() } : {}),
+        details,
+        dataflow,
         formats,
         severity: severity.length ? severity : "all",
         status: status.length ? status : "all",
@@ -213,45 +342,227 @@ export function ReportGenerator({
           <div className="report-column">
             <fieldset>
               <legend>1 · Data</legend>
-              <div className="source-options">
-                <label
-                  className={
-                    "source-option" + (source === "loaded" ? " on" : "")
-                  }
-                >
-                  <input
-                    type="radio"
-                    checked={source === "loaded"}
-                    onChange={() => setSource("loaded")}
-                  />
-                  <b>Loaded data</b>
-                  <small>
-                    {overview.loadedRows
-                      ? `${overview.loadedRows.toLocaleString()} issues currently in Pulse (${state.snapshot?.source || "CSV"}). Instant; no Snyk API call.`
-                      : "Load a CSV or pull from the Snyk API first."}
-                  </small>
-                </label>
-                <label
-                  className={
-                    "source-option" +
-                    (source === "api" ? " on" : "") +
-                    (overview.canUseApi ? "" : " disabled")
-                  }
-                >
-                  <input
-                    type="radio"
-                    disabled={!overview.canUseApi}
-                    checked={source === "api"}
-                    onChange={() => setSource("api")}
-                  />
-                  <b>Live from Snyk</b>
-                  <small>
-                    {overview.canUseApi
-                      ? `Fresh Export API pull for ${state.store?.source?.kind === "api" ? state.store.source.scopeName || "the saved scope" : "the saved scope"}. Takes minutes; uses 1 of 20 exports/hour.`
-                      : "Available after pulling data from the Snyk API (token and scope are reused)."}
-                  </small>
-                </label>
+              <div className="source-options source-options--four">
+                {SOURCES.map(([id, name, hint]) => {
+                  const disabled = id === "csv" && !overview.loadedRows;
+                  return (
+                    <label
+                      key={id}
+                      className={
+                        "source-option" +
+                        (source === id ? " on" : "") +
+                        (disabled ? " disabled" : "")
+                      }
+                    >
+                      <input
+                        type="radio"
+                        name="report-source"
+                        disabled={disabled}
+                        checked={source === id}
+                        onChange={() => setSource(id)}
+                      />
+                      <b>{name}</b>
+                      <small>
+                        {id === "csv" && overview.loadedRows
+                          ? `${overview.loadedRows.toLocaleString()} issues currently in Pulse (${state.snapshot?.source || "CSV"}). Instant; no Snyk API call.`
+                          : id === "csv"
+                            ? "Load a CSV or pull from the Snyk API first."
+                            : hint}
+                      </small>
+                    </label>
+                  );
+                })}
               </div>
+              {isApi && (
+                <div className="scope-picker">
+                  <div className="form-row">
+                    <label>
+                      Snyk region
+                      <select
+                        aria-label="Snyk region"
+                        value={region}
+                        disabled={scopeBusy}
+                        onChange={(e) => {
+                          setRegion(e.target.value);
+                          resetScope();
+                        }}
+                      >
+                        {REGIONS.map(([v, l]) => (
+                          <option key={v} value={v}>
+                            {l}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label>
+                      API token
+                      <input
+                        type="password"
+                        autoComplete="off"
+                        placeholder={
+                          overview.canUseApi || connection
+                            ? "Saved — leave blank to reuse"
+                            : "Paste a Snyk token"
+                        }
+                        value={token}
+                        onChange={(e) => setToken(e.target.value)}
+                      />
+                    </label>
+                  </div>
+                  <div className="scope-actions">
+                    <button
+                      type="button"
+                      disabled={scopeBusy || (!token && !overview.canUseApi && !connection)}
+                      onClick={connect}
+                    >
+                      {scopeBusy && !connection
+                        ? "Connecting…"
+                        : connection
+                          ? "Reconnect"
+                          : "Connect and list groups"}
+                    </button>
+                    {connection && (
+                      <small className="muted">
+                        {connection.identity.name} ·{" "}
+                        {connection.groups.length} group(s),{" "}
+                        {connection.orgs.length} organization(s)
+                      </small>
+                    )}
+                  </div>
+                  {connection && (
+                    <>
+                      <div className="form-row">
+                        <label>
+                          Group
+                          <select
+                            aria-label="Group"
+                            value={group}
+                            disabled={scopeBusy}
+                            onChange={(e) => pickGroup(e.target.value)}
+                          >
+                            <option value="">All groups I can see</option>
+                            {connection.groups.map((g) => (
+                              <option key={g.id} value={g.id}>
+                                {g.name}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                        <label>
+                          Organization
+                          <select
+                            aria-label="Organization"
+                            value={org}
+                            disabled={scopeBusy}
+                            onChange={(e) => pickOrg(e.target.value)}
+                          >
+                            {!orgChoices.length && <option value="">No organizations</option>}
+                            {orgChoices.map((o) => (
+                              <option key={o.id} value={o.id}>
+                                {o.name}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                      </div>
+                      <div className="target-picker">
+                        <div className="scope-actions">
+                          <span className="field-label">
+                            Targets <small>(none selected = every target)</small>
+                          </span>
+                          <button
+                            type="button"
+                            disabled={scopeBusy || !org}
+                            onClick={loadTargets}
+                          >
+                            {targets ? "Reload targets" : "Choose targets…"}
+                          </button>
+                        </div>
+                        {targets &&
+                          (targets.length ? (
+                            <div className="chip-row target-chips">
+                              {targets.map((t) => (
+                                <label
+                                  key={t.id}
+                                  className={"chip" + (pickedTargets.includes(t.name) ? " on" : "")}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={pickedTargets.includes(t.name)}
+                                    onChange={() =>
+                                      setPickedTargets(
+                                        pickedTargets.includes(t.name)
+                                          ? pickedTargets.filter((x) => x !== t.name)
+                                          : [...pickedTargets, t.name],
+                                      )
+                                    }
+                                  />
+                                  {t.name}
+                                </label>
+                              ))}
+                            </div>
+                          ) : (
+                            <small className="muted">This organization has no targets.</small>
+                          ))}
+                      </div>
+                    </>
+                  )}
+                  {!connection && overview.canUseApi && (
+                    <small className="muted">
+                      Or leave this and use the saved Snyk connection and scope.
+                    </small>
+                  )}
+                </div>
+              )}
+              {source === "cli" && (
+                <div className="scope-picker">
+                  <label>
+                    Folder to scan
+                    <input
+                      value={folder}
+                      onChange={(e) => setFolder(e.target.value)}
+                      placeholder="/Users/you/projects/my-app"
+                      spellCheck={false}
+                    />
+                  </label>
+                  <span className="field-label">Scans to run</span>
+                  <Chips
+                    values={["sast", "sca"]}
+                    selected={cliScans}
+                    onChange={setCliScans}
+                    label={(v) => (v === "sast" ? "Code (snyk code test)" : "Open Source (snyk test)")}
+                  />
+                  <small className="muted">
+                    Runs on this computer with the Snyk CLI's own login (
+                    <code>snyk auth</code>), or the token above if you enter one.
+                  </small>
+                  <label>
+                    Snyk token (optional)
+                    <input
+                      type="password"
+                      autoComplete="off"
+                      placeholder="Leave blank to use the CLI login"
+                      value={token}
+                      onChange={(e) => setToken(e.target.value)}
+                    />
+                  </label>
+                </div>
+              )}
+              {(isApi || source === "csv") && (
+                <label className="code-path">
+                  Code folder (optional)
+                  <input
+                    value={codePath}
+                    onChange={(e) => setCodePath(e.target.value)}
+                    placeholder="/Users/you/projects/my-app"
+                    spellCheck={false}
+                  />
+                  <small className="muted">
+                    A checkout of the scanned repository. Snyk returns positions, not code;
+                    this shows the code at each data-flow step.
+                  </small>
+                </label>
+              )}
               <div className="period-picker">
                 <label>
                   Findings first introduced
@@ -294,9 +605,13 @@ export function ReportGenerator({
                 )}
               </div>
               <small className="muted">
-                {source === "api"
+                {source === "export"
                   ? "Sent to the Snyk Export API as the introduced-date filter."
-                  : "Keeps loaded findings whose FIRST_INTRODUCED date falls in this period."}
+                  : source === "issues"
+                    ? "Keeps live findings first introduced in this period."
+                    : source === "cli"
+                      ? "A local scan reports what it finds now; the period does not apply."
+                      : "Keeps loaded findings whose FIRST_INTRODUCED date falls in this period."}
               </small>
             </fieldset>
             <fieldset>
@@ -395,6 +710,26 @@ export function ReportGenerator({
                 onChange={setFormats}
                 label={(v) => FORMATS.find(([k]) => k === v)?.[1] || v}
               />
+              {source !== "csv" && (
+                <label className="check-row">
+                  <input
+                    type="checkbox"
+                    checked={details}
+                    onChange={(e) => setDetails(e.target.checked)}
+                  />
+                  Include Snyk's description and remediation advice on each detail page
+                </label>
+              )}
+              {(isApi || source === "cli") && (
+                <label className="check-row">
+                  <input
+                    type="checkbox"
+                    checked={dataflow}
+                    onChange={(e) => setDataflow(e.target.checked)}
+                  />
+                  Include the Snyk Code data flow
+                </label>
+              )}
               <small className="muted">
                 PDF uses your installed Chrome, Chromium or Edge. Large reports:
                 keep the findings register to a few hundred rows for a
